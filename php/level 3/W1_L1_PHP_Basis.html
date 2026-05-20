@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 1 Les 1 – Welkom bij PHP</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #0f0f1a; color: #e0e0e0; }
+
+        .slide { display: none; flex-direction: column; justify-content: center; align-items: center; padding: 40px 70px 90px; min-height: 100vh; animation: fadeIn 0.4s ease; }
+        .slide.active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+        h1 { font-size: 2.8em; color: #a855f7; text-align: center; }
+        h2 { font-size: 2em; color: #c084fc; margin-bottom: 8px; text-align: center; }
+        h3 { font-size: 1.1em; color: #c084fc; margin-bottom: 8px; }
+        .slide-phase { font-size: 0.75em; color: #555; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 6px; }
+        .slide-desc { color: #888; font-size: 1em; text-align: center; margin-bottom: 22px; max-width: 660px; line-height: 1.5; }
+        .subtitle { font-size: 1.3em; color: #888; margin-top: 8px; }
+
+        .nav { position: fixed; bottom: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; padding: 12px 30px; background: rgba(15,15,26,0.97); border-top: 1px solid #222; z-index: 100; }
+        .nav button { background: #a855f7; color: white; border: none; padding: 10px 25px; border-radius: 8px; font-size: 1em; cursor: pointer; }
+        .nav button:hover { background: #9333ea; }
+        .nav button:disabled { background: #333; cursor: not-allowed; }
+        .nav .progress { color: #666; font-size: 0.9em; }
+        .progress-bar { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, #a855f7, #ec4899); transition: width 0.3s ease; z-index: 100; }
+
+        .wrap { max-width: 960px; width: 100%; display: flex; flex-direction: column; gap: 14px; }
+        .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; width: 100%; }
+        .col { background: #161625; border: 1px solid #2a2a40; border-radius: 12px; padding: 20px; }
+
+        .code { background: #0d1117; border: 1px solid #1e1e30; border-radius: 10px; padding: 18px 22px; font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace; font-size: 0.95em; line-height: 1.8; position: relative; width: 100%; }
+        .code .file { position: absolute; top: 8px; right: 12px; font-size: 0.7em; color: #555; font-family: 'Segoe UI', sans-serif; background: #161625; padding: 2px 8px; border-radius: 4px; }
+        .kw { color: #ff7b72; } .var { color: #79c0ff; } .str { color: #a5d6ff; }
+        .fn { color: #d2a8ff; } .cmt { color: #8b949e; font-style: italic; } .num { color: #79c0ff; }
+
+        .result { background: #0f1a0f; border: 1px solid #2ea043; border-radius: 8px; padding: 12px 18px; width: 100%; }
+        .result-lbl { font-size: 0.75em; color: #2ea043; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+        .result-val { color: #7ee787; font-size: 1em; }
+
+        .info { background: rgba(168,85,247,0.08); border: 1px solid #2a2a40; border-radius: 10px; padding: 14px 20px; display: flex; align-items: flex-start; gap: 12px; width: 100%; }
+        .info .ico { font-size: 1.3em; flex-shrink: 0; margin-top: 1px; }
+        .info p { font-size: 0.9em; color: #aaa; margin: 0; line-height: 1.5; }
+        .info strong { color: #c084fc; }
+        .warn { background: rgba(234,179,8,0.08); border: 1px solid #5f4a1e; border-radius: 10px; padding: 14px 20px; display: flex; align-items: flex-start; gap: 12px; width: 100%; }
+        .warn p { font-size: 0.9em; color: #fde68a; margin: 0; line-height: 1.5; }
+
+        .steps { display: flex; flex-direction: column; gap: 0; width: 100%; }
+        .step { display: flex; align-items: center; gap: 18px; }
+        .step-n { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.1em; flex-shrink: 0; color: white; }
+        .step-lbl { min-width: 160px; }
+        .step-title { font-weight: bold; font-size: 0.95em; }
+        .step-sub { color: #888; font-size: 0.8em; }
+        .step-content { flex: 1; }
+        .conn { margin-left: 20px; width: 2px; height: 14px; background: #333; }
+
+        .arch { display: flex; align-items: center; gap: 25px; }
+        .arch-box { width: 170px; height: 190px; border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .arch-box svg { width: 75px; height: 75px; margin-bottom: 10px; }
+        .arch-box .lbl { font-weight: bold; font-size: 1.05em; }
+        .arch-box .sub { font-size: 0.8em; color: #999; margin-top: 3px; }
+        .b-browser { background: linear-gradient(135deg,#1e293b,#1e3a5f); border: 2px solid #3b82f6; animation: glow 3s ease-in-out infinite; }
+        .b-server { background: linear-gradient(135deg,#1e293b,#3b1e5f); border: 2px solid #a855f7; animation: glow 3s ease-in-out infinite 1s; }
+        .arch-arrow { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 110px; }
+        .arr-line { position: relative; width: 100%; height: 3px; background: #333; border-radius: 2px; overflow: hidden; }
+        .arr-line .pkt { position: absolute; width: 20px; height: 3px; border-radius: 2px; }
+        .pkt-r { background: #3b82f6; animation: pR 2s ease-in-out infinite; }
+        .pkt-l { background: #22c55e; animation: pL 2s ease-in-out infinite 1s; }
+        @keyframes pR { 0%{left:-20px;opacity:0}10%{opacity:1}90%{opacity:1}100%{left:100%;opacity:0} }
+        @keyframes pL { 0%{left:100%;opacity:0}10%{opacity:1}90%{opacity:1}100%{left:-20px;opacity:0} }
+        @keyframes glow { 0%,100%{box-shadow:0 0 10px rgba(168,85,247,0.1)}50%{box-shadow:0 0 25px rgba(168,85,247,0.2)} }
+        .arr-lbl { font-size: 0.72em; color: #666; text-align: center; }
+
+        .quiz-card { background: #161625; border: 2px solid #2a2a40; border-radius: 14px; padding: 24px; width: 100%; }
+        .quiz-q { font-size: 1.05em; color: #e0e0e0; margin-bottom: 16px; line-height: 1.5; }
+        .quiz-opts { display: flex; flex-direction: column; gap: 8px; }
+        .quiz-opt { background: #0d1117; border: 2px solid #2a2a40; border-radius: 8px; padding: 12px 18px; cursor: pointer; transition: all 0.2s; font-size: 0.95em; }
+        .quiz-opt:hover { border-color: #a855f7; background: #1a1a2e; }
+        .quiz-opt.correct { border-color: #22c55e; background: rgba(34,197,94,0.1); color: #7ee787; }
+        .quiz-opt.wrong { border-color: #ef4444; background: rgba(239,68,68,0.1); color: #fca5a5; }
+        .quiz-explain { margin-top: 14px; padding: 14px; background: rgba(34,197,94,0.08); border: 1px solid #22c55e; border-radius: 8px; display: none; font-size: 0.9em; color: #7ee787; line-height: 1.5; }
+        .quiz-explain.show { display: block; }
+
+        .agenda { list-style: none; width: 100%; }
+        .agenda li { display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-bottom: 1px solid #1e1e30; font-size: 1.05em; }
+        .agenda li:last-child { border-bottom: none; }
+        .agenda .a-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.1em; flex-shrink: 0; }
+        .agenda .a-time { color: #555; font-size: 0.85em; min-width: 50px; text-align: right; }
+
+        .tree { font-family: 'Cascadia Code', Consolas, monospace; font-size: 0.95em; line-height: 2; background: #0d1117; border: 1px solid #1e1e30; border-radius: 10px; padding: 20px 24px; width: 100%; }
+        .tree .folder { color: #f59e0b; } .tree .phpfile { color: #a855f7; } .tree .dim { color: #555; }
+
+        .type-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; width: 100%; }
+        .type-card { background: #161625; border: 1px solid #2a2a40; border-radius: 12px; padding: 18px 14px; text-align: center; }
+        .type-name { font-family: monospace; font-size: 1em; font-weight: bold; margin-bottom: 6px; }
+        .type-ex { font-family: monospace; font-size: 0.85em; color: #a5d6ff; background: #0d1117; border-radius: 6px; padding: 6px 10px; margin-top: 8px; }
+        .type-desc { font-size: 0.8em; color: #888; margin-top: 6px; }
+
+        button.action-btn { background: #a855f7; color: white; border: none; padding: 10px 22px; border-radius: 8px; font-size: 0.9em; cursor: pointer; margin-top: 8px; }
+        button.action-btn:hover { background: #9333ea; }
+
+        .end-title { font-size: 3em; color: #a855f7; text-align: center; }
+        .end-sub { font-size: 1.3em; color: #888; text-align: center; margin-top: 10px; }
+
+        .parsons-line { background: #0d1117; border: 2px solid #2a2a40; border-radius: 8px; padding: 12px 18px; font-family: 'Cascadia Code', Consolas, monospace; font-size: 0.95em; cursor: grab; user-select: none; transition: border-color 0.15s; }
+        #parsons-list { display: flex; flex-direction: column; gap: 8px; margin: 14px 0; }
+    </style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- ═══ SLIDE 0: TITEL ═══ -->
+<div class="slide active">
+    <div class="slide-phase">Week 1 &mdash; Les 1</div>
+    <h1>Welkom bij PHP</h1>
+    <p class="subtitle">Installatie · Eerste code · Variabelen &amp; datatypes</p>
+    <div class="arch" style="margin-top:40px;">
+        <div class="arch-box b-browser">
+            <svg viewBox="0 0 80 80" fill="none">
+                <rect x="4" y="10" width="72" height="56" rx="8" stroke="#3b82f6" stroke-width="2.5" fill="#0d1117"/>
+                <line x1="4" y1="24" x2="76" y2="24" stroke="#3b82f6" stroke-width="2"/>
+                <circle cx="16" cy="17" r="3" fill="#ff5f57"/><circle cx="26" cy="17" r="3" fill="#febc2e"/><circle cx="36" cy="17" r="3" fill="#28c840"/>
+                <rect x="14" y="32" width="52" height="4" rx="2" fill="#1e3a5f"/>
+                <rect x="14" y="42" width="38" height="4" rx="2" fill="#1e3a5f"/>
+            </svg>
+            <span class="lbl" style="color:#3b82f6;">Jouw Browser</span>
+            <span class="sub">Vraagt een pagina op</span>
+        </div>
+        <div class="arch-arrow">
+            <div class="arr-lbl" style="color:#3b82f6;">verzoek →</div>
+            <div class="arr-line"><div class="pkt pkt-r"></div></div>
+            <div class="arr-line"><div class="pkt pkt-l"></div></div>
+            <div class="arr-lbl" style="color:#22c55e;">← HTML terug</div>
+        </div>
+        <div class="arch-box b-server">
+            <svg viewBox="0 0 80 80" fill="none">
+                <rect x="12" y="6" width="56" height="20" rx="4" stroke="#a855f7" stroke-width="2.5" fill="#0d1117"/>
+                <rect x="12" y="30" width="56" height="20" rx="4" stroke="#a855f7" stroke-width="2.5" fill="#0d1117"/>
+                <rect x="12" y="54" width="56" height="20" rx="4" stroke="#a855f7" stroke-width="2.5" fill="#0d1117"/>
+                <circle cx="56" cy="16" r="3" fill="#22c55e"/><circle cx="56" cy="40" r="3" fill="#22c55e"/><circle cx="56" cy="64" r="3" fill="#f59e0b"/>
+                <rect x="20" y="13" width="24" height="6" rx="2" fill="#1e1e3a"/>
+                <rect x="20" y="37" width="24" height="6" rx="2" fill="#1e1e3a"/>
+                <rect x="20" y="61" width="24" height="6" rx="2" fill="#1e1e3a"/>
+            </svg>
+            <span class="lbl" style="color:#a855f7;">XAMPP Server</span>
+            <span class="sub">Voert PHP code uit</span>
+        </div>
+    </div>
+    <p style="color:#555; font-size:0.85em; margin-top:28px;">ROC Midden Nederland &mdash; Periode 3 &mdash; PHP</p>
+</div>
+
+<!-- ═══ SLIDE 1: AGENDA ═══ -->
+<div class="slide">
+    <div class="slide-phase">Programma</div>
+    <h2>Wat gaan we vandaag doen?</h2>
+    <div class="wrap">
+        <ul class="agenda" style="background:#161625; border-radius:12px; border:1px solid #2a2a40;">
+            <li><div class="a-icon" style="background:#1e3a5f;color:#60a5fa;">1</div><div style="flex:1;"><strong>Eindresultaat tonen</strong><br><span style="color:#888;">Wat bouw je deze periode?</span></div><div class="a-time">5 min</div></li>
+            <li><div class="a-icon" style="background:#2d1e5f;color:#c084fc;">2</div><div style="flex:1;"><strong>XAMPP installeren</strong><br><span style="color:#888;">Je eigen server opzetten</span></div><div class="a-time">10 min</div></li>
+            <li><div class="a-icon" style="background:#1e3a5f;color:#60a5fa;">3</div><div style="flex:1;"><strong>Hoe werkt PHP?</strong><br><span style="color:#888;">Server-side vs. client-side</span></div><div class="a-time">10 min</div></li>
+            <li><div class="a-icon" style="background:#1e5f3b;color:#4ade80;">4</div><div style="flex:1;"><strong>Eerste PHP code</strong><br><span style="color:#888;">echo, PHP tags, PHP + HTML mixen</span></div><div class="a-time">10 min</div></li>
+            <li><div class="a-icon" style="background:#5f4a1e;color:#fbbf24;">5</div><div style="flex:1;"><strong>Variabelen &amp; datatypes</strong><br><span style="color:#888;">Data opslaan, regels, types</span></div><div class="a-time">10 min</div></li>
+            <li><div class="a-icon" style="background:#5f1e3b;color:#f472b6;">6</div><div style="flex:1;"><strong>Oefenen</strong><br><span style="color:#888;">Quizzes, gezamenlijke en individuele opdracht</span></div><div class="a-time">15 min</div></li>
+        </ul>
+    </div>
+</div>
+
+<!-- ═══ SLIDE 2: EINDRESULTAAT ═══ -->
+<div class="slide">
+    <div class="slide-phase">Het eindresultaat</div>
+    <h2>Dit bouw je: een Gastenboek</h2>
+    <p class="slide-desc">Aan het einde van deze periode heb je een volledig werkend gastenboek met login, admin panel en beveiliging.</p>
+    <div class="wrap">
+        <div style="background:#161625; border:1px solid #2a2a40; border-radius:12px; overflow:hidden; width:100%;">
+            <div style="background:#1e1e30; padding:12px 20px; display:flex; justify-content:space-between; align-items:center;">
+                <div style="font-weight:bold; color:#c084fc; font-size:1.1em;">🗒️ Gastenboek</div>
+                <div style="display:flex; gap:10px;">
+                    <span style="background:#2d1e5f; padding:4px 12px; border-radius:4px; font-size:0.8em; color:#c084fc;">Berichten</span>
+                    <span style="background:#0d1117; padding:4px 12px; border-radius:4px; font-size:0.8em; color:#888;">Inloggen</span>
+                    <span style="background:#0d1117; padding:4px 12px; border-radius:4px; font-size:0.8em; color:#888;">Registreren</span>
+                </div>
+            </div>
+            <div style="padding:18px; display:flex; flex-direction:column; gap:10px;">
+                <div style="background:#0d1117; border-radius:8px; padding:12px 16px; border-left:3px solid #a855f7;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                        <strong style="color:#c084fc;">Tom</strong><span style="color:#555; font-size:0.8em;">08-02-2026 10:30</span>
+                    </div>
+                    <p style="color:#aaa; font-size:0.9em;">Geweldige les vandaag!</p>
+                </div>
+                <div style="background:#0d1117; border-radius:8px; padding:12px 16px; border-left:3px solid #3b82f6;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                        <strong style="color:#60a5fa;">Cara</strong><span style="color:#555; font-size:0.8em;">07-02-2026 15:45</span>
+                    </div>
+                    <p style="color:#aaa; font-size:0.9em;">Fijne community hier!</p>
+                </div>
+            </div>
+        </div>
+        <div class="info">
+            <div class="ico">🎯</div>
+            <p><strong>Vandaag is de allereerste stap:</strong> server opzetten, eerste PHP code schrijven en leren werken met variabelen. Dit zijn de fundamenten waar alles op rust.</p>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ SLIDE 3: XAMPP INSTALLEREN ═══ -->
+<div class="slide">
+    <div class="slide-phase">Stap 1 &mdash; Installatie</div>
+    <h2>XAMPP installeren</h2>
+    <p class="slide-desc">XAMPP maakt van jouw laptop een lokale webserver met Apache, PHP en MySQL</p>
+    <div class="wrap">
+        <div class="steps">
+            <div class="step">
+                <div class="step-n" style="background:#3b82f6;">1</div>
+                <div class="step-lbl"><div class="step-title" style="color:#60a5fa;">Download XAMPP</div><div class="step-sub">apachefriends.org → Download</div></div>
+                <div class="step-content"><div style="background:#161625; border:1px solid #3b82f6; border-radius:8px; padding:12px 16px; color:#a5d6ff; font-size:0.9em;">Kies de <strong>Windows</strong> versie met <strong>PHP 8.x</strong></div></div>
+            </div>
+            <div class="conn"></div>
+            <div class="step">
+                <div class="step-n" style="background:#a855f7;">2</div>
+                <div class="step-lbl"><div class="step-title" style="color:#c084fc;">Installeer XAMPP</div><div class="step-sub">Standaard instellingen zijn prima</div></div>
+                <div class="step-content"><div style="background:#161625; border:1px solid #a855f7; border-radius:8px; padding:12px 16px; font-size:0.9em; color:#aaa;">Installeer in <code style="color:#c084fc;">C:\xampp</code> — verander dit <strong>niet</strong></div></div>
+            </div>
+            <div class="conn"></div>
+            <div class="step">
+                <div class="step-n" style="background:#22c55e;">3</div>
+                <div class="step-lbl"><div class="step-title" style="color:#4ade80;">Start Apache</div><div class="step-sub">In het XAMPP Control Panel</div></div>
+                <div class="step-content"><div style="background:#161625; border:1px solid #22c55e; border-radius:8px; padding:12px 16px; display:flex; align-items:center; gap:10px;"><div style="width:12px; height:12px; border-radius:50%; background:#22c55e; box-shadow:0 0 8px #22c55e;"></div><span style="color:#7ee787; font-size:0.9em;">Apache → <strong>Start</strong> — groen = het werkt!</span></div></div>
+            </div>
+            <div class="conn"></div>
+            <div class="step">
+                <div class="step-n" style="background:#f59e0b;">4</div>
+                <div class="step-lbl"><div class="step-title" style="color:#fbbf24;">Test het!</div><div class="step-sub">Open je browser</div></div>
+                <div class="step-content"><div style="background:#161625; border:1px solid #f59e0b; border-radius:8px; overflow:hidden;"><div style="background:#1e1e30; padding:5px 10px; display:flex; gap:4px; align-items:center;"><div style="width:8px;height:8px;border-radius:50%;background:#ff5f57;"></div><div style="width:8px;height:8px;border-radius:50%;background:#febc2e;"></div><div style="width:8px;height:8px;border-radius:50%;background:#28c840;"></div><div style="flex:1;background:#0d0d1a;border-radius:3px;padding:3px 10px;margin-left:8px;font-family:monospace;font-size:0.8em;color:#a5d6ff;">http://localhost</div></div><div style="padding:10px 16px; font-size:0.9em; color:#7ee787;">XAMPP dashboard zichtbaar → het werkt!</div></div></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ SLIDE 4: PROJECT MAP ═══ -->
+<div class="slide">
+    <div class="slide-phase">Stap 1 &mdash; Installatie</div>
+    <h2>Project map aanmaken</h2>
+    <p class="slide-desc">Al je PHP bestanden komen in een map binnen <code style="color:#f59e0b;">C:\xampp\htdocs</code></p>
+    <div class="wrap">
+        <div class="tree">
+            <span class="folder">C:\xampp\</span><br>
+            &nbsp;&nbsp;├── <span class="dim">apache\</span><br>
+            &nbsp;&nbsp;├── <span class="dim">mysql\</span><br>
+            &nbsp;&nbsp;├── <span class="dim">php\</span><br>
+            &nbsp;&nbsp;└── <span class="folder">htdocs\</span> &nbsp;&nbsp;&nbsp;← <span style="color:#f59e0b;">hier komen je websites</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <span class="folder">gastenboek\</span> &nbsp;← <span style="color:#22c55e;">jouw projectmap</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <span class="phpfile">index.php</span> &nbsp;&nbsp;&nbsp;← <span style="color:#a855f7;">je eerste bestand</span>
+        </div>
+        <div class="cols">
+            <div class="info"><div class="ico">📁</div><p>Maak de map <strong>gastenboek</strong> aan in <code style="color:#f59e0b;">C:\xampp\htdocs\</code></p></div>
+            <div class="info"><div class="ico">🌐</div><p>Je opent het via <strong style="color:#a5d6ff;">http://localhost/gastenboek/</strong></p></div>
+        </div>
+        <div class="warn">
+            <div style="font-size:1.2em; flex-shrink:0;">⚠️</div>
+            <p>Zet je bestanden <strong>altijd</strong> in htdocs, anders vindt de server ze niet. En gebruik altijd <strong>.php</strong> als extensie, nooit .html voor PHP-bestanden!</p>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ SLIDE 5: HOE WERKT PHP ═══ -->
+<div class="slide">
+    <div class="slide-phase">Stap 2 &mdash; Theorie</div>
+    <h2>Hoe werkt PHP?</h2>
+    <p class="slide-desc">PHP draait op de <strong style="color:#a855f7;">server</strong>. De gebruiker ziet alleen het resultaat — nooit jouw code.</p>
+    <div class="wrap">
+        <div class="steps">
+            <div class="step">
+                <div class="step-n" style="background:#3b82f6;">1</div>
+                <div class="step-lbl"><div class="step-title" style="color:#60a5fa;">Jij typt een URL</div><div class="step-sub">localhost/gastenboek/index.php</div></div>
+                <div class="step-content"><div style="background:#161625; border:1px solid #3b82f6; border-radius:8px; overflow:hidden;"><div style="background:#1e1e30; padding:5px 10px; display:flex; gap:4px; align-items:center;"><div style="width:7px;height:7px;border-radius:50%;background:#ff5f57;"></div><div style="width:7px;height:7px;border-radius:50%;background:#febc2e;"></div><div style="width:7px;height:7px;border-radius:50%;background:#28c840;"></div><div style="flex:1;background:#0d0d1a;border-radius:3px;padding:2px 8px;margin-left:6px;font-family:monospace;font-size:0.8em;color:#a5d6ff;">localhost/gastenboek/index.php</div></div></div></div>
+            </div>
+            <div class="conn"></div>
+            <div class="step">
+                <div class="step-n" style="background:#a855f7;">2</div>
+                <div class="step-lbl"><div class="step-title" style="color:#c084fc;">Server leest het bestand</div><div class="step-sub">En voert de PHP code uit</div></div>
+                <div class="step-content"><div class="code" style="padding:10px 14px; font-size:0.85em;"><span class="kw">&lt;?php</span> <span class="fn">echo</span> <span class="str">"Welkom!"</span>; <span class="kw">?&gt;</span></div></div>
+            </div>
+            <div class="conn"></div>
+            <div class="step">
+                <div class="step-n" style="background:#22c55e;">3</div>
+                <div class="step-lbl"><div class="step-title" style="color:#4ade80;">HTML terug naar browser</div><div class="step-sub">Alleen het resultaat, geen PHP</div></div>
+                <div class="step-content"><div style="background:#0f1a0f; border:1px solid #22c55e; border-radius:8px; padding:10px 14px; color:#7ee787; font-size:0.95em;">Welkom!</div></div>
+            </div>
+        </div>
+        <div class="cols">
+            <div class="info"><div class="ico">💡</div><p><strong>PHP vs JavaScript:</strong> JavaScript draait in de <em>browser</em>. PHP draait op de <em>server</em>. Beide zijn mogelijk, maar voor databases heb je server-side nodig.</p></div>
+            <div class="warn"><div style="font-size:1.2em;flex-shrink:0;">👁️</div><p>Rechts-klikken → "Paginabron weergeven" toont <strong>alleen HTML</strong>. Je PHP code is onzichtbaar voor bezoekers!</p></div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ SLIDE 6: PHP TAGS + ECHO ═══ -->
+<div class="slide">
+    <div class="slide-phase">Stap 3 &mdash; Eerste code</div>
+    <h2>Code blokken &amp; echo</h2>
+    <p class="slide-desc">PHP code staat altijd tussen <code style="color:#ff7b72;">&lt;?php</code> en <code style="color:#ff7b72;">?&gt;</code></p>
+    <div class="wrap">
+        <div class="code">
+            <div class="file">index.php</div>
+            <span class="kw">&lt;?php</span><br>
+            <br>
+            <span class="cmt">// Dit is commentaar — wordt niet uitgevoerd</span><br>
+            <span class="fn">echo</span> <span class="str">'Hallo wereld!'</span>;<br>
+            <br>
+            <span class="kw">?&gt;</span>
+        </div>
+        <div class="result">
+            <div class="result-lbl">Resultaat in browser</div>
+            <div class="result-val">Hallo wereld!</div>
+        </div>
+        <div class="cols">
+            <div class="col">
+                <h3>echo</h3>
+                <p style="font-size:0.9em; color:#aaa; line-height:1.6; margin-top:6px;">Stuurt tekst naar de browser.<br>Elke <strong style="color:#c084fc;">opdracht eindigt met ;</strong><br>Tekst tussen <code class="str">'...'</code> of <code class="str">"..."</code></p>
+            </div>
+            <div class="col">
+                <h3>Commentaar</h3>
+                <div class="code" style="margin-top:8px; padding:10px 14px;">
+                    <span class="cmt">// Één regel commentaar</span><br>
+                    <span class="cmt">/* Meerdere regels<br>&nbsp;&nbsp; commentaar */</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ SLIDE 7: VOORSPEL DE OUTPUT ═══ -->
+<div class="slide">
+    <div class="slide-phase">Even nadenken</div>
+    <h2>Wat denk je dat deze code doet?</h2>
+    <p class="slide-desc">Bespreek met je buurman/buurvrouw. Nog <strong>niet</strong> uitproberen!</p>
+    <div class="wrap">
+        <div class="code" style="font-size:1.05em;">
+            <div class="file">welkom.php</div>
+            <span class="kw">&lt;!DOCTYPE html&gt;</span><br>
+            <span class="kw">&lt;html&gt;</span><br>
+            <span class="kw">&lt;body&gt;</span><br>
+            &nbsp;&nbsp;<span class="kw">&lt;h1&gt;</span>Welkom<span class="kw">&lt;/h1&gt;</span><br>
+            &nbsp;&nbsp;<span class="kw">&lt;p&gt;</span>Datum: <span class="kw">&lt;?php</span> <span class="fn">echo</span> <span class="fn">date</span>(<span class="str">'d-m-Y'</span>); <span class="kw">?&gt;</span><span class="kw">&lt;/p&gt;</span><br>
+            <span class="kw">&lt;/body&gt;</span><br>
+            <span class="kw">&lt;/html&gt;</span>
+        </div>
+        <div class="quiz-card" id="qPredict">
+            <div class="quiz-q">Wat zie je in de browser als je dit bestand opent?</div>
+            <div class="quiz-opts">
+                <div class="quiz-opt" onclick="checkQuiz(this,false,'qPredict')">A: De PHP code zelf (met &lt;?php erin)</div>
+                <div class="quiz-opt" onclick="checkQuiz(this,true,'qPredict')">B: "Welkom" als titel en de datum van vandaag</div>
+                <div class="quiz-opt" onclick="checkQuiz(this,false,'qPredict')">C: Alleen "Welkom" — de datum wordt niet getoond</div>
+                <div class="quiz-opt" onclick="checkQuiz(this,false,'qPredict')">D: Een foutmelding</div>
+            </div>
+            <div class="quiz-explain" id="qPredict-explain">De server voert <code>date('d-m-Y')</code> uit en vervangt dat stukje door de datum. De HTML-structuur blijft staan. In de paginabron zie je later <em>nooit</em> &lt;?php — alleen het resultaat.</div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ SLIDE 8: PHP + HTML MIXEN ═══ -->
+<div class="slide">
+    <div class="slide-phase">Stap 3 &mdash; Eerste code</div>
+    <h2>PHP &amp; HTML mixen</h2>
+    <p class="slide-desc">Je kunt PHP en HTML door elkaar gebruiken in hetzelfde bestand</p>
+    <div class="wrap">
+        <div class="code">
+            <div class="file">welkom.php</div>
+            <span class="kw">&lt;!DOCTYPE html&gt;</span><br>
+            <span class="kw">&lt;html&gt;</span><br>
+            <span class="kw">&lt;body&gt;</span><br>
+            &nbsp;&nbsp;<span class="kw">&lt;h1&gt;</span>Mijn Gastenboek<span class="kw">&lt;/h1&gt;</span><br>
+            &nbsp;&nbsp;<span class="kw">&lt;p&gt;</span>Het is nu: <span class="kw">&lt;?php</span> <span class="fn">echo</span> <span class="fn">date</span>(<span class="str">'d-m-Y H:i'</span>); <span class="kw">?&gt;</span><span class="kw">&lt;/p&gt;</span><br>
+            <span class="kw">&lt;/body&gt;</span><br>
+            <span class="kw">&lt;/html&gt;</span>
+        </div>
+        <div class="result">
+            <div class="result-lbl">Resultaat in browser</div>
+            <div class="result-val"><strong style="color:white; font-size:1.2em;">Mijn Gastenboek</strong><br>Het is nu: 08-05-2026 10:30</div>
+        </div>
+        <div class="info"><div class="ico">💡</div><p>De HTML blijft gewoon staan. Alleen de stukken tussen <code style="color:#ff7b72;">&lt;?php ?&gt;</code> worden uitgevoerd en <em>vervangen</em> door het resultaat. De rest van het bestand gaat ongewijzigd door.</p></div>
+    </div>
+</div>
+
+<!-- ═══ SLIDE 9: VARIABELEN ═══ -->
+<div class="slide">
+    <div class="slide-phase">Stap 4 &mdash; Variabelen</div>
+    <h2>Variabelen</h2>
+    <p class="slide-desc">Een variabele is een <strong style="color:#c084fc;">opslag</strong> met een naam. In PHP begint elke variabele met <code style="color:#79c0ff;">$</code></p>
+    <div class="wrap">
+        <div class="code">
+            <div class="file">variabelen.php</div>
+            <span class="kw">&lt;?php</span><br>
+            <br>
+            <span class="var">$naam</span>    = <span class="str">"Alex"</span>;    <span class="cmt">// tekst (string)</span><br>
+            <span class="var">$leeftijd</span> = <span class="num">19</span>;       <span class="cmt">// geheel getal (int)</span><br>
+            <span class="var">$score</span>    = <span class="num">8.5</span>;     <span class="cmt">// decimaal (float)</span><br>
+            <span class="var">$actief</span>   = <span class="kw">true</span>;    <span class="cmt">// waar/onwaar (bool)</span><br>
+            <br>
+            <span class="fn">echo</span> <span class="var">$naam</span>;       <span class="cmt">// Alex</span><br>
+            <span class="fn">echo</span> <span class="var">$leeftijd</span>;  <span class="cmt">// 19</span><br>
+            <br>
+            <span class="kw">?&gt;</span>
+        </div>
+        <div style="display:flex; gap:16px; justify-content:center; flex-wrap:wrap;">
+            <div style="text-align:center;"><div style="font-size:0.75em; color:#79c0ff; font-family:monospace; margin-bottom:4px;">$naam</div><div style="background:#1e3a5f; border:2px solid #3b82f6; border-radius:10px; padding:12px 20px; font-weight:bold; color:#a5d6ff;">"Alex"</div><div style="font-size:0.7em; color:#555; margin-top:4px;">string</div></div>
+            <div style="text-align:center;"><div style="font-size:0.75em; color:#79c0ff; font-family:monospace; margin-bottom:4px;">$leeftijd</div><div style="background:#2d1e5f; border:2px solid #a855f7; border-radius:10px; padding:12px 20px; font-weight:bold; color:#c084fc;">19</div><div style="font-size:0.7em; color:#555; margin-top:4px;">int</div></div>
+            <div style="text-align:center;"><div style="font-size:0.75em; color:#79c0ff; font-family:monospace; margin-bottom:4px;">$score</div><div style="background:#1e3a1e; border:2px solid #22c55e; border-radius:10px; padding:12px 20px; font-weight:bold; color:#7ee787;">8.5</div><div style="font-size:0.7em; color:#555; margin-top:4px;">float</div></div>
+            <div style="text-align:center;"><div style="font-size:0.75em; color:#79c0ff; font-family:monospace; margin-bottom:4px;">$actief</div><div style="background:#3a1e1e; border:2px solid #f59e0b; border-radius:10px; padding:12px 20px; font-weight:bold; color:#fbbf24;">true</div><div style="font-size:0.7em; color:#555; margin-top:4px;">bool</div></div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ SLIDE 10: VARIABELEN REGELS ═══ -->
+<div class="slide">
+    <div class="slide-phase">Stap 4 &mdash; Variabelen</div>
+    <h2>Regels voor variabelen</h2>
+    <div class="wrap">
+        <div class="cols">
+            <div class="col" style="border-color:#22c55e;">
+                <h3 style="color:#4ade80;">✅ Mag wel</h3>
+                <div class="code" style="margin-top:10px;">
+                    <span class="var">$naam</span> = <span class="str">"Tom"</span>;<br>
+                    <span class="var">$gebruikers_naam</span> = <span class="str">"Bo"</span>;<br>
+                    <span class="var">$xp2</span> = <span class="num">100</span>;<br>
+                    <span class="var">$_admin</span> = <span class="kw">true</span>;
+                </div>
+                <p style="font-size:0.85em; color:#888; margin-top:10px; line-height:1.5;">Begin met $ + letter of underscore.<br>Mag daarna ook cijfers bevatten.</p>
+            </div>
+            <div class="col" style="border-color:#ef4444;">
+                <h3 style="color:#fca5a5;">❌ Mag niet</h3>
+                <div class="code" style="margin-top:10px;">
+                    <span style="text-decoration:line-through;color:#ef4444;">$2naam</span> = <span class="str">"Tom"</span>; <span class="cmt">// start met cijfer</span><br>
+                    <span style="text-decoration:line-through;color:#ef4444;">$mijn naam</span> = <span class="str">"Bo"</span>; <span class="cmt">// spatie</span><br>
+                    <span style="text-decoration:line-through;color:#ef4444;">$mijn-xp</span> = <span class="num">100</span>; <span class="cmt">// streepje</span><br>
+                    <span style="text-decoration:line-through;color:#ef4444;">naam</span> = <span class="str">"test"</span>; <span class="cmt">// geen $</span>
+                </div>
+            </div>
+        </div>
+        <div class="warn"><div style="font-size:1.2em;flex-shrink:0;">⚠️</div><p><strong>Hoofdlettergevoelig!</strong> <code>$Naam</code> en <code>$naam</code> zijn twee <em>verschillende</em> variabelen. PHP maakt dit onderscheid altijd. Wees consistent!</p></div>
+    </div>
+</div>
+
+<!-- ═══ SLIDE 11: DATATYPES ═══ -->
+<div class="slide">
+    <div class="slide-phase">Stap 4 &mdash; Datatypes</div>
+    <h2>De 4 basis datatypes</h2>
+    <p class="slide-desc">PHP bepaalt het type <strong>automatisch</strong> — je hoeft het niet op te geven</p>
+    <div class="wrap">
+        <div class="type-grid">
+            <div class="type-card" style="border-color:#3b82f6;">
+                <div class="type-name" style="color:#60a5fa;">string</div>
+                <div class="type-ex">"Hallo"<br>'Wereld'</div>
+                <div class="type-desc">Tekst, altijd tussen quotes</div>
+            </div>
+            <div class="type-card" style="border-color:#a855f7;">
+                <div class="type-name" style="color:#c084fc;">int</div>
+                <div class="type-ex">42<br>-7<br>0</div>
+                <div class="type-desc">Geheel getal</div>
+            </div>
+            <div class="type-card" style="border-color:#22c55e;">
+                <div class="type-name" style="color:#4ade80;">float</div>
+                <div class="type-ex">3.14<br>8.5<br>-0.5</div>
+                <div class="type-desc">Decimaal getal</div>
+            </div>
+            <div class="type-card" style="border-color:#f59e0b;">
+                <div class="type-name" style="color:#fbbf24;">bool</div>
+                <div class="type-ex">true<br>false</div>
+                <div class="type-desc">Waar of onwaar</div>
+            </div>
+        </div>
+        <div class="code">
+            <div class="file">datatypes.php</div>
+            <span class="kw">&lt;?php</span><br>
+            <span class="var">$tekst</span>  = <span class="str">"Gastenboek"</span>;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cmt">// string</span><br>
+            <span class="var">$aantal</span> = <span class="num">42</span>;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cmt">// int</span><br>
+            <span class="var">$prijs</span>  = <span class="num">9.99</span>;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cmt">// float</span><br>
+            <span class="var">$ingelogd</span> = <span class="kw">true</span>;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cmt">// bool</span><br>
+            <span class="fn">var_dump</span>(<span class="var">$tekst</span>);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cmt">// string(10) "Gastenboek"</span><br>
+            <span class="fn">var_dump</span>(<span class="var">$ingelogd</span>);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cmt">// bool(true)</span><br>
+            <span class="kw">?&gt;</span>
+        </div>
+        <div class="info"><div class="ico">💡</div><p><code>var_dump()</code> is jouw beste vriend bij het debuggen: het toont zowel het <strong>type</strong> als de <strong>waarde</strong> van een variabele. Gebruik het als je twijfelt wat er in een variabele zit.</p></div>
+    </div>
+</div>
+
+<!-- ═══ SLIDE 12: STRINGS SAMENVOEGEN ═══ -->
+<div class="slide">
+    <div class="slide-phase">Stap 4 &mdash; Strings</div>
+    <h2>Strings samenvoegen</h2>
+    <p class="slide-desc">In PHP plak je teksten aan elkaar met een <strong style="color:#a855f7;">punt (.)</strong></p>
+    <div class="wrap">
+        <div class="code">
+            <div class="file">strings.php</div>
+            <span class="kw">&lt;?php</span><br>
+            <span class="var">$voornaam</span> = <span class="str">"Anna"</span>;<br>
+            <span class="var">$achternaam</span> = <span class="str">"Jansen"</span>;<br>
+            <br>
+            <span class="cmt">// Manier 1: punt operator</span><br>
+            <span class="fn">echo</span> <span class="var">$voornaam</span> . <span class="str">" "</span> . <span class="var">$achternaam</span>;&nbsp;&nbsp;&nbsp;<span class="cmt">// Anna Jansen</span><br>
+            <br>
+            <span class="cmt">// Manier 2: variabelen in dubbele quotes</span><br>
+            <span class="fn">echo</span> <span class="str">"Hallo <span class="var">$voornaam</span>!"</span>;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cmt">// Hallo Anna!</span><br>
+            <br>
+            <span class="cmt">// Let op: enkele quotes werken NIET!</span><br>
+            <span class="fn">echo</span> <span class="str">'Hallo $voornaam!'</span>;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cmt">// Hallo $voornaam!</span><br>
+            <span class="kw">?&gt;</span>
+        </div>
+        <div class="warn"><div style="font-size:1.2em;flex-shrink:0;">⚠️</div><p><strong>Enkle vs. dubbele quotes:</strong> In <code>"..."</code> worden variabelen vervangen. In <code>'...'</code> zie je letterlijk de tekst — inclusief het dollarteken. Dit is de meest gemaakte fout bij beginners!</p></div>
+    </div>
+</div>
+
+<!-- ═══ SLIDE 13: QUIZ 1 ═══ -->
+<div class="slide">
+    <div class="slide-phase">Even checken</div>
+    <h2>Theorie check</h2>
+    <div class="wrap">
+        <div class="quiz-card" id="q1">
+            <div class="quiz-q">Wat is de output van deze code?
+                <div class="code" style="margin-top:10px;">
+                    <span class="var">$score</span> = <span class="num">100</span>;<br>
+                    <span class="fn">echo</span> <span class="str">"Score: "</span> . <span class="var">$score</span>;
+                </div>
+            </div>
+            <div class="quiz-opts">
+                <div class="quiz-opt" onclick="checkQuiz(this,false,'q1')">A: Score: $score</div>
+                <div class="quiz-opt" onclick="checkQuiz(this,true,'q1')">B: Score: 100</div>
+                <div class="quiz-opt" onclick="checkQuiz(this,false,'q1')">C: Foutmelding — je mist een puntkomma</div>
+                <div class="quiz-opt" onclick="checkQuiz(this,false,'q1')">D: Score:</div>
+            </div>
+            <div class="quiz-explain" id="q1-explain">De <strong>punt (.)</strong> plakt "Score: " en de waarde van $score (100) aan elkaar. Het resultaat is "Score: 100". Alternatief: <code>"Score: $score"</code> met dubbele quotes werkt ook.</div>
+        </div>
+        <div class="quiz-card" id="q2">
+            <div class="quiz-q">Wat is de output van: <code><span class="fn">echo</span> <span class="str">'Hallo $naam'</span>;</code> als $naam = "Tom"?</div>
+            <div class="quiz-opts">
+                <div class="quiz-opt" onclick="checkQuiz(this,false,'q2')">A: Hallo Tom</div>
+                <div class="quiz-opt" onclick="checkQuiz(this,true,'q2')">B: Hallo $naam</div>
+                <div class="quiz-opt" onclick="checkQuiz(this,false,'q2')">C: Foutmelding</div>
+            </div>
+            <div class="quiz-explain" id="q2-explain">Met <strong>enkele aanhalingstekens</strong> worden variabelen NIET vervangen. Je ziet letterlijk <code>$naam</code>. Gebruik dubbele aanhalingstekens als je een variabele in een string wilt invoegen.</div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ SLIDE 14: QUIZ 2 ═══ -->
+<div class="slide">
+    <div class="slide-phase">Even checken</div>
+    <h2>Theorie check</h2>
+    <div class="wrap">
+        <div class="quiz-card" id="q3">
+            <div class="quiz-q">Waar draait PHP code?</div>
+            <div class="quiz-opts">
+                <div class="quiz-opt" onclick="checkQuiz(this,false,'q3')">A: In de browser, net als JavaScript</div>
+                <div class="quiz-opt" onclick="checkQuiz(this,true,'q3')">B: Op de server (bijv. XAMPP)</div>
+                <div class="quiz-opt" onclick="checkQuiz(this,false,'q3')">C: Op allebei tegelijk</div>
+                <div class="quiz-opt" onclick="checkQuiz(this,false,'q3')">D: In het besturingssysteem van de gebruiker</div>
+            </div>
+            <div class="quiz-explain" id="q3-explain">PHP draait <strong>alleen op de server</strong>. XAMPP is je lokale server. De browser stuurt een verzoek, de server voert de PHP code uit en stuurt alleen HTML terug.</div>
+        </div>
+        <div class="quiz-card" id="q4">
+            <div class="quiz-q">Wat gebeurt er als je een PHP-bestand opslaat als <code>.html</code> in plaats van <code>.php</code>?</div>
+            <div class="quiz-opts">
+                <div class="quiz-opt" onclick="checkQuiz(this,false,'q4')">A: Het werkt gewoon</div>
+                <div class="quiz-opt" onclick="checkQuiz(this,true,'q4')">B: De PHP code wordt niet uitgevoerd — je ziet de code letterlijk</div>
+                <div class="quiz-opt" onclick="checkQuiz(this,false,'q4')">C: Je krijgt een foutmelding van de server</div>
+            </div>
+            <div class="quiz-explain" id="q4-explain">De server kijkt naar de <strong>bestandsextensie</strong>. Bij .html stuurt hij het bestand direct door zonder het uit te voeren. Bij .php voert hij eerst de PHP code uit. Met .html zie je <code>&lt;?php echo "test"; ?&gt;</code> letterlijk in je browser.</div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ SLIDE 15: PARSONS ═══ -->
+<div class="slide">
+    <div class="slide-phase">Even checken</div>
+    <h2>Code puzzel</h2>
+    <p class="slide-desc">Deze regels code staan door elkaar. Sleep ze in de juiste volgorde!</p>
+    <div class="wrap">
+        <div class="quiz-card">
+            <div class="quiz-q">Doel: toon <strong style="color:#7ee787;">"Hallo Gastenboek, het is nu [datum]"</strong></div>
+            <div id="parsons-list">
+                <div class="parsons-line" draggable="true" data-order="4">?&gt;</div>
+                <div class="parsons-line" draggable="true" data-order="2"><span class="var">$titel</span> = <span class="str">"Gastenboek"</span>;</div>
+                <div class="parsons-line" draggable="true" data-order="1">&lt;?php</div>
+                <div class="parsons-line" draggable="true" data-order="3"><span class="fn">echo</span> <span class="str">"Hallo "</span> . <span class="var">$titel</span> . <span class="str">", het is nu "</span> . <span class="fn">date</span>(<span class="str">'d-m-Y'</span>);</div>
+            </div>
+            <button class="action-btn" onclick="checkParsons()">Controleer volgorde</button>
+            <div id="parsons-result" style="display:none; margin-top:12px;"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ SLIDE 16: DEBUG OEFENING ═══ -->
+<div class="slide">
+    <div class="slide-phase">Even checken</div>
+    <h2>Fouten zoeken</h2>
+    <p class="slide-desc">Deze code bevat <strong style="color:#ef4444;">3 fouten</strong>. Kun je ze allemaal vinden?</p>
+    <div class="wrap">
+        <div class="code" style="font-size:1.05em;">
+            <div class="file">kapot.php</div>
+            <span class="kw">&lt;?php</span><br>
+            <br>
+            <span class="var" style="text-decoration:underline;text-decoration-color:#ef4444;">naam</span> = <span class="str">"Bo"</span><br>
+            <span class="var">$leeftijd</span> = <span class="num">19</span>;<br>
+            <br>
+            <span class="fn">echo</span> <span class="str">"Ik ben "</span> . <span class="var" style="text-decoration:underline;text-decoration-color:#ef4444;">$Naam</span>;<br>
+            <span class="fn">echo</span> <span class="str">" en ik ben "</span> . <span class="var">$leeftijd</span><br>
+            <br>
+            <span class="kw">?&gt;</span>
+        </div>
+        <button class="action-btn" onclick="showDebug()">Toon de 3 fouten</button>
+        <div id="debug-answer" style="display:none;">
+            <div class="steps">
+                <div class="step"><div class="step-n" style="background:#ef4444;width:32px;height:32px;font-size:0.9em;">1</div><div style="flex:1;color:#fca5a5;font-size:0.9em;"><code>naam</code> mist het <strong>$</strong> teken → moet <code style="color:#79c0ff;">$naam</code> zijn</div></div>
+                <div class="conn"></div>
+                <div class="step"><div class="step-n" style="background:#ef4444;width:32px;height:32px;font-size:0.9em;">2</div><div style="flex:1;color:#fca5a5;font-size:0.9em;">Regel 3 mist een <strong>puntkomma ;</strong> na "Bo"</div></div>
+                <div class="conn"></div>
+                <div class="step"><div class="step-n" style="background:#ef4444;width:32px;height:32px;font-size:0.9em;">3</div><div style="flex:1;color:#fca5a5;font-size:0.9em;"><code>$Naam</code> ≠ <code>$naam</code> — PHP is <strong>hoofdlettergevoelig!</strong><br><span style="color:#888;">(De laatste echo mist ook een puntkomma)</span></div></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ SLIDE 17: KLASSIKALE OPDRACHT ═══ -->
+<div class="slide">
+    <div class="slide-phase">Stap 5 &mdash; Samen oefenen</div>
+    <h2>Klassikale oefening</h2>
+    <p class="slide-desc">We bouwen samen een profiel-pagina. Werk in tweetallen!</p>
+    <div class="wrap">
+        <div class="cols" style="margin-bottom:8px;">
+            <div class="info" style="border-color:#3b82f6;"><div class="ico">⌨️</div><p><strong style="color:#60a5fa;">Driver:</strong> typt de code op het toetsenbord</p></div>
+            <div class="info" style="border-color:#22c55e;"><div class="ico">👁️</div><p><strong style="color:#4ade80;">Navigator:</strong> kijkt mee, checkt fouten, denkt mee</p></div>
+        </div>
+        <div class="code">
+            <div class="file">gastenboek/index.php</div>
+            <span class="kw">&lt;?php</span><br>
+            <span class="cmt">// Stap 1: Maak variabelen voor naam, klas, hobby en favoriete taal</span><br>
+            <span style="color:#f59e0b; background:#3a2e00; padding:1px 6px; border-radius:3px;">??? vul zelf aan ???</span><br>
+            <span class="kw">?&gt;</span><br>
+            <br>
+            <span class="kw">&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;body&gt;</span><br>
+            &nbsp;&nbsp;<span class="kw">&lt;h1&gt;</span>Welkom, <span class="kw">&lt;?php</span> <span class="fn">echo</span> <span style="color:#f59e0b;">???</span>; <span class="kw">?&gt;</span><span class="kw">&lt;/h1&gt;</span><br>
+            &nbsp;&nbsp;<span class="kw">&lt;p&gt;</span>Klas: <span class="kw">&lt;?php</span> <span class="fn">echo</span> <span style="color:#f59e0b;">???</span>; <span class="kw">?&gt;</span><span class="kw">&lt;/p&gt;</span><br>
+            &nbsp;&nbsp;<span class="cmt">&lt;!-- Stap 2: voeg p-tags toe voor hobby en favoriete taal --&gt;</span><br>
+            <span class="kw">&lt;/body&gt;&lt;/html&gt;</span>
+        </div>
+        <div class="cols">
+            <div class="info"><div class="ico">💡</div><p><strong>Hints:</strong> Variabelen beginnen met $. Vergeet de puntkomma niet. Gebruik echo om een variabele te tonen.</p></div>
+            <div class="info"><div class="ico">💻</div><p><strong>Test:</strong> Open <code style="color:#a5d6ff;">http://localhost/gastenboek/</code> — werkt het? Wissel dan van rol!</p></div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ SLIDE 18: VRAGEN ═══ -->
+<div class="slide">
+    <div class="slide-phase">Stap 5</div>
+    <h2 style="font-size:2.5em;">Vragen?</h2>
+    <p class="slide-desc" style="font-size:1.2em; max-width:520px;">
+        Snap je hoe XAMPP werkt?<br>
+        Snap je wat <code>echo</code> doet?<br>
+        Snap je wat een variabele is?<br>
+        Weet je het verschil tussen <code>'...'</code> en <code>"..."</code>?<br><br>
+        Stel je vragen <strong style="color:#c084fc;">nu</strong> — er zijn geen domme vragen!
+    </p>
+</div>
+
+<!-- ═══ SLIDE 19: INDIVIDUELE OPDRACHT ═══ -->
+<div class="slide">
+    <div class="slide-phase">Stap 6 &mdash; Zelfstandig werken</div>
+    <h2>Individuele opdracht</h2>
+    <p class="slide-desc">Maak een nieuw bestand <code style="color:#a855f7;">over_mij.php</code> in je <code style="color:#f59e0b;">gastenboek</code> map.</p>
+    <div class="wrap">
+        <div class="col" style="border-color:#a855f7;">
+            <h3>Opdracht: Jouw profiel-pagina</h3>
+            <div style="font-size:0.95em; color:#ccc; line-height:1.9; margin-top:10px;">
+                <strong style="color:#c084fc;">1.</strong> Maak variabelen aan:<br>
+                &nbsp;&nbsp;&nbsp;<code class="var">$naam</code>, <code class="var">$klas</code>, <code class="var">$leeftijd</code>, <code class="var">$hobby</code>, <code class="var">$favoriete_taal</code><br><br>
+                <strong style="color:#c084fc;">2.</strong> Bouw een volledige HTML-pagina:<br>
+                &nbsp;&nbsp;&nbsp;Gebruik <code>&lt;h1&gt;</code> voor je naam, <code>&lt;p&gt;</code> voor de rest<br><br>
+                <strong style="color:#c084fc;">3.</strong> Voeg minstens <strong>2 extra variabelen</strong> toe naar eigen keuze<br><br>
+                <strong style="color:#c084fc;">4.</strong> Toon de huidige datum onderaan met <code class="fn">date</code>()<br><br>
+                <strong style="color:#c084fc;">Bonus:</strong> Gebruik <code>var_dump()</code> tijdelijk om je variabelen te controleren
+            </div>
+        </div>
+        <div class="info"><div class="ico">🔧</div><p>Open <code style="color:#a5d6ff;">http://localhost/gastenboek/over_mij.php</code> om je resultaat te zien. Pas een variabele aan en ververs de pagina — zie je de verandering?</p></div>
+    </div>
+</div>
+
+<!-- ═══ SLIDE 20: TERUGKOPPELING ═══ -->
+<div class="slide">
+    <div class="slide-phase">Terugkoppeling</div>
+    <h2>Hoe past dit in je gastenboek?</h2>
+    <div class="wrap">
+        <div class="steps">
+            <div class="step">
+                <div class="step-n" style="background:#22c55e;">✓</div>
+                <div style="flex:1;"><div class="step-title" style="color:#4ade80;">XAMPP draait — je hebt een werkende lokale server</div><div class="step-sub">Hier draait straks je gastenboek op</div></div>
+            </div>
+            <div class="conn"></div>
+            <div class="step">
+                <div class="step-n" style="background:#22c55e;">✓</div>
+                <div style="flex:1;"><div class="step-title" style="color:#4ade80;">echo — je kunt tekst en data naar de browser sturen</div><div class="step-sub">Straks toon je zo berichten, namen en datums</div></div>
+            </div>
+            <div class="conn"></div>
+            <div class="step">
+                <div class="step-n" style="background:#22c55e;">✓</div>
+                <div style="flex:1;"><div class="step-title" style="color:#4ade80;">Variabelen — je kunt data opslaan en weergeven</div><div class="step-sub">$naam, $bericht, $datum — dit worden straks echte gastenboekgegevens</div></div>
+            </div>
+            <div class="conn"></div>
+            <div class="step">
+                <div class="step-n" style="background:#a855f7;">→</div>
+                <div style="flex:1;"><div class="step-title" style="color:#c084fc;">Volgende les: loops, functies en arrays</div><div class="step-sub">Dan kun je meerdere berichten tegelijk verwerken en weergeven</div></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ SLIDE 21: AFSLUITING ═══ -->
+<div class="slide">
+    <div class="end-title">Tot volgende les!</div>
+    <p class="end-sub" style="margin-top:16px;">Volgende les: loops, functies &amp; arrays</p>
+    <div style="margin-top:40px; display:flex; gap:24px; flex-wrap:wrap; justify-content:center;">
+        <div style="background:#161625; border:1px solid #2a2a40; border-radius:12px; padding:20px 28px; text-align:center; min-width:200px;">
+            <div style="font-size:0.75em; color:#555; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px;">Vergeet niet</div>
+            <p style="color:#aaa; font-size:0.9em; line-height:1.8;">Apache starten in XAMPP<br>Bestanden opslaan als <strong style="color:#a855f7;">.php</strong><br>Werken vanuit <strong style="color:#f59e0b;">htdocs</strong><br>Testen via <strong style="color:#60a5fa;">localhost</strong></p>
+        </div>
+        <div style="background:#161625; border:1px solid #2a2a40; border-radius:12px; padding:20px 28px; text-align:center; min-width:200px;">
+            <div style="font-size:0.75em; color:#555; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px;">Documentatie</div>
+            <p style="color:#aaa; font-size:0.9em; line-height:1.8;"><strong style="color:#c084fc;">php.net/manual/nl</strong><br>w3schools.com/php<br>Google: "PHP [onderwerp]"</p>
+        </div>
+    </div>
+</div>
+
+<!-- Navigation -->
+<div class="nav">
+    <button id="prevBtn" onclick="changeSlide(-1)" disabled>← Vorige</button>
+    <span class="progress" id="progressText">1 / 22</span>
+    <button id="nextBtn" onclick="changeSlide(1)">Volgende →</button>
+</div>
+
+<script>
+    let cur = 0;
+    const slides = document.querySelectorAll('.slide');
+    const total = slides.length;
+
+    function showSlide(i) {
+        slides.forEach(s => s.classList.remove('active'));
+        slides[i].classList.add('active');
+        document.getElementById('prevBtn').disabled = i === 0;
+        document.getElementById('nextBtn').disabled = i === total - 1;
+        document.getElementById('progressText').textContent = `${i+1} / ${total}`;
+        document.getElementById('progressBar').style.width = ((i+1)/total*100)+'%';
+        window.scrollTo(0,0);
+    }
+    function changeSlide(d) { cur = Math.max(0, Math.min(total-1, cur+d)); showSlide(cur); }
+    document.addEventListener('keydown', e => {
+        if (e.key==='ArrowRight'||e.key==='ArrowDown') changeSlide(1);
+        if (e.key==='ArrowLeft'||e.key==='ArrowUp') changeSlide(-1);
+    });
+    showSlide(0);
+
+    function checkQuiz(el, correct, id) {
+        const card = document.getElementById(id);
+        if (card.dataset.answered) return;
+        card.dataset.answered = 'true';
+        card.querySelectorAll('.quiz-opt').forEach(o => { o.style.cursor='default'; });
+        if (correct) { el.classList.add('correct'); }
+        else {
+            el.classList.add('wrong');
+            card.querySelectorAll('.quiz-opt').forEach(o => { if(o.dataset.correct==='true') o.classList.add('correct'); });
+        }
+        document.getElementById(id+'-explain').classList.add('show');
+    }
+    // Manually set data-correct on quiz options
+    document.querySelectorAll('.quiz-opt').forEach(o => {
+        o.setAttribute('data-correct', o.onclick.toString().includes(',true,') ? 'true' : 'false');
+    });
+
+    // Parsons
+    (function(){
+        const list = document.getElementById('parsons-list');
+        let dragEl = null;
+        list.addEventListener('dragstart', e => { dragEl = e.target.closest('.parsons-line'); if(dragEl) dragEl.style.opacity='0.4'; });
+        list.addEventListener('dragend', () => { if(dragEl) dragEl.style.opacity='1'; list.querySelectorAll('.parsons-line').forEach(el=>el.style.borderColor='#2a2a40'); dragEl=null; });
+        list.addEventListener('dragover', e => { e.preventDefault(); const t=e.target.closest('.parsons-line'); if(t&&t!==dragEl){list.querySelectorAll('.parsons-line').forEach(el=>el.style.borderColor='#2a2a40');t.style.borderColor='#a855f7';} });
+        list.addEventListener('drop', e => { e.preventDefault(); const t=e.target.closest('.parsons-line'); if(!t||t===dragEl)return; const items=[...list.querySelectorAll('.parsons-line')]; if(items.indexOf(dragEl)<items.indexOf(t))t.after(dragEl);else t.before(dragEl); });
+    })();
+
+    function checkParsons() {
+        const items = [...document.querySelectorAll('#parsons-list .parsons-line')];
+        const res = document.getElementById('parsons-result');
+        let ok = true;
+        items.forEach((item,i) => {
+            if(parseInt(item.dataset.order)===i+1) item.style.borderColor='#22c55e';
+            else { item.style.borderColor='#ef4444'; ok=false; }
+        });
+        res.style.display='block';
+        if(ok) res.innerHTML='<div style="background:rgba(34,197,94,0.1);border:1px solid #22c55e;border-radius:8px;padding:12px 18px;color:#7ee787;">✓ Goed! Volgorde: &lt;?php → variabele aanmaken → echo → ?&gt;</div>';
+        else { res.innerHTML='<div style="background:rgba(239,68,68,0.1);border:1px solid #ef4444;border-radius:8px;padding:12px 18px;color:#fca5a5;">Nog niet helemaal goed. Wat moet er gebeuren vóór je echo kunt gebruiken?</div>'; setTimeout(()=>{ items.forEach(i=>i.style.borderColor='#2a2a40'); res.style.display='none'; },3000); }
+    }
+    function showDebug() { document.getElementById('debug-answer').style.display='block'; }
+</script>
+</body>
+</html>
