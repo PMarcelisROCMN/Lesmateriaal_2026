@@ -34,14 +34,15 @@ pdfmetrics.registerFontFamily('CourierNew', normal='CourierNew', bold='CourierNe
 DARK      = HexColor('#1A2E35')
 TEAL      = HexColor('#028090')
 GRAY      = HexColor('#4B5563')
-CODE_TEXT = HexColor('#A8D8EA')
-INFO_BG1  = HexColor('#EBF8FA')
-INFO_BG2  = HexColor('#F0FAFF')
-CODE_BG   = HexColor('#1E2D40')
-TIP_BG    = HexColor('#FEF3C7')
+CODE_TEXT = HexColor('#1A2E35')
+INFO_BG1  = HexColor('#F5F5F5')
+INFO_BG2  = HexColor('#FAFAFA')
+CODE_BG   = HexColor('#F0F0F0')
+TIP_BG    = HexColor('#FFFBF0')
 WHITE     = HexColor('#FFFFFF')
-ROW_ALT   = HexColor('#F8FDFE')
-GRID_LINE = HexColor('#E5E7EB')
+ROW_ALT   = HexColor('#F5F5F5')
+GRID_LINE = HexColor('#CCCCCC')
+HDR_BG    = HexColor('#E0E0E0')
 
 # ─── Page geometry ─────────────────────────────────────────────────────────────
 PW, PH   = A4
@@ -57,7 +58,7 @@ def S(name, **kw):
 
 sLabel  = S('lbl',    fontName='Arial-Bold', fontSize=10, textColor=TEAL,  spaceAfter=3,  leading=14)
 sPartDl = S('pdl',    fontName='Arial-Bold', fontSize=10, textColor=TEAL,  leading=14)
-sPartTt = S('ptt',    fontName='Arial-Bold', fontSize=20, textColor=WHITE, leading=26)
+sPartTt = S('ptt',    fontName='Arial-Bold', fontSize=20, textColor=DARK,  leading=26)
 sTitle  = S('ttl',    fontName='Arial-Bold', fontSize=24, textColor=DARK,  spaceAfter=4,  leading=30)
 sSubtit = S('sub',    fontName='Arial',      fontSize=13, textColor=GRAY,  spaceAfter=14, leading=18)
 sH1     = S('h1',     fontName='Arial-Bold', fontSize=16, textColor=DARK,  spaceBefore=16, spaceAfter=5, leading=22)
@@ -69,7 +70,7 @@ sCode   = S('code',   fontName='CourierNew', fontSize=9,  textColor=CODE_TEXT, l
 sIL     = S('il',     fontName='Arial-Bold', fontSize=10, textColor=DARK,  leading=14)
 sIV     = S('iv',     fontName='Arial',      fontSize=10, textColor=GRAY,  leading=14)
 sTip    = S('tip',    fontName='Arial',      fontSize=10, textColor=DARK,  leading=15)
-sTHdr   = S('thdr',   fontName='Arial-Bold', fontSize=10, textColor=WHITE, leading=13)
+sTHdr   = S('thdr',   fontName='Arial-Bold', fontSize=10, textColor=DARK,  leading=13)
 sTCode  = S('tcode',  fontName='CourierNew', fontSize=9,  textColor=DARK,  leading=13)
 sTBody  = S('tbody',  fontName='Arial',      fontSize=10, textColor=GRAY,  leading=14)
 
@@ -151,7 +152,7 @@ def info_table(rows):
     t.setStyle(TableStyle(style))
     return t
 
-def two_col_table(headers, rows, col_ratios=(0.35, 0.65), hdr_bg=DARK):
+def two_col_table(headers, rows, col_ratios=(0.35, 0.65), hdr_bg=HDR_BG):
     w0, w1 = CW * col_ratios[0], CW * col_ratios[1]
     data = [[Paragraph(h, sTHdr) for h in headers]]
     for a, b in rows:
@@ -178,7 +179,9 @@ def part_header(deel, title):
         [Paragraph(title, sPartTt)],
     ], colWidths=[CW])
     t.setStyle(TableStyle([
-        ('BACKGROUND',    (0,0), (-1,-1), DARK),
+        ('BACKGROUND',    (0,0), (-1,-1), HDR_BG),
+        ('BOX',           (0,0), (-1,-1), 1,   DARK),
+        ('LINEBEFORE',    (0,0), (0,-1),  4,   TEAL),
         ('LEFTPADDING',   (0,0), (-1,-1), 16),
         ('RIGHTPADDING',  (0,0), (-1,-1), 16),
         ('TOPPADDING',    (0,0), (0,0),   12),
@@ -190,10 +193,11 @@ def part_header(deel, title):
 
 def flow_box(text):
     p = Paragraph(text, S('flow', fontName='Arial-Bold', fontSize=11,
-        textColor=WHITE, alignment=TA_CENTER, leading=16))
+        textColor=DARK, alignment=TA_CENTER, leading=16))
     t = Table([[p]], colWidths=[CW])
     t.setStyle(TableStyle([
-        ('BACKGROUND',    (0,0), (-1,-1), DARK),
+        ('BACKGROUND',    (0,0), (-1,-1), HDR_BG),
+        ('BOX',           (0,0), (-1,-1), 1, DARK),
         ('TOPPADDING',    (0,0), (-1,-1), 10),
         ('BOTTOMPADDING', (0,0), (-1,-1), 10),
         ('LEFTPADDING',   (0,0), (-1,-1), 12),
@@ -531,7 +535,7 @@ declare(strict_types=1);""")]
             ('readonly',  'Eenmalig schrijfbaar, daarna alleen lezen'),
         ],
         col_ratios=(0.3, 0.7),
-        hdr_bg=DARK,
+        hdr_bg=HDR_BG,
     )]
     s += [sp(6)]
     s += [body('Gebruik `private` voor alles wat een intern implementatiedetail is. Maak properties alleen `public` als andere code er echt bij moet.')]
@@ -589,7 +593,7 @@ public function save():        void    { ... }  // geeft niets terug""")]
             ('Repository',  'Data lezen en schrijven naar de database'),
         ],
         col_ratios=(0.28, 0.72),
-        hdr_bg=TEAL,
+        hdr_bg=HDR_BG,
     )]
     s += [sp(6)]
     s += [body('**Gouden regel:** elke laag praat alleen met zijn directe buur. De controller roept de service aan, de service roept de repository aan. De controller schrijft nooit SQL.')]
@@ -658,6 +662,405 @@ $authController = new AuthController($authService);""")]
 
     return s
 
+# ══════════════════════════════════════════ OPDRACHT: ENVIRONMENT ═════════════
+
+def opdracht_environment_story():
+    s = []
+    s += [lbl('PHP · Level 4')]
+    s += [title('Environment & Autoloader')]
+    s += [subtit('Van hardcoded spaghetti naar een nette projectstructuur')]
+    s += [info_table([
+        ('Leerjaar',  'Jaar 1 · Periode 2'),
+        ('Doel',      'PSR-4 autoloading, namespaces, .env en het singleton-patroon stap voor stap opbouwen'),
+        ('Werkwijze', 'Individueel · gebruik je eigen IDE en XAMPP'),
+        ('Inleveren', 'PHP-map gezipt via de gebruikelijke manier'),
+    ])]
+
+    # ── Intro ──────────────────────────────────────────────────────────────────
+    s += [h1('Wat ga je bouwen?')]
+    s += [body('Je begint met de meest simpele versie die werkt: een paar regels PHP die praten met de database. Daarna verbeter je die code stap voor stap. Elke stap lost een concreet probleem op.')]
+    s += [body('Aan het einde heb je:')]
+    s += [bul('omgevingsvariabelen in een `.env`-bestand')]
+    s += [bul('automatische class-loading via Composer (PSR-4)')]
+    s += [bul('een `Database`-klasse met het singleton-patroon')]
+    s += [bul('een `UserRepository` die alle SQL afhandelt')]
+    s += [sp(8)]
+
+    # ── Voorbereiding ──────────────────────────────────────────────────────────
+    s += [h1('Voorbereiding: database importeren')]
+    s += [body('Importeer `user_repo_opdracht.sql` via phpMyAdmin: **Importeren → bestand kiezen → Uitvoeren**.')]
+    s += [sp(4)]
+
+    # ── Stap 1 ─────────────────────────────────────────────────────────────────
+    s += [h1('Stap 1: Het werkt, maar het is lelijk')]
+    s += [body('Maak een nieuwe map aan met de naam `Environment` in je XAMPP `htdocs`-map. Maak daarin `index.php` aan:')]
+    s += [code(r"""<?php
+
+$pdo = new PDO('mysql:host=localhost;dbname=user_repo_opdracht', 'root', '');
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+$stmt = $pdo->prepare('SELECT * FROM users WHERE username = ?');
+$stmt->execute(['peter']);
+$user = $stmt->fetch();
+
+var_dump($user);""")]
+    s += [sp(6)]
+    s += [body('Open de browser en ga naar `localhost/Environment/index.php`.')]
+    s += [sp(4)]
+    s += [body('Het werkt. Maar het wachtwoord staat hardcoded in je code. Als je dit op GitHub zet, ziet iedereen je databasewachtwoord.')]
+    s += [sp(4)]
+
+    # ── Stap 2 ─────────────────────────────────────────────────────────────────
+    s += [h1('Stap 2: Wachtwoorden uit de code')]
+    s += [body('**Probleem:** credentials staan letterlijk in je code. **Oplossing:** sla ze op in een `.env`-bestand en laad ze in via phpdotenv.')]
+    s += [sp(4)]
+
+    s += [h2('Composer initialiseren')]
+    s += [body('Open een terminal in de `Environment`-map en voer uit:')]
+    s += [code('composer init')]
+    s += [sp(6)]
+    s += [body('Vul in bij **Package name**: `php/app`. De rest: Enter om over te slaan. Composer genereert een `composer.json` met daarin al een `autoload` PSR-4 sectie. Pas de namespace daarin aan naar `App\\\\`:')]
+    s += [code(r"""{
+    "name": "php/app",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "require": {}
+}""")]
+    s += [sp(4)]
+
+    s += [h2('phpdotenv installeren')]
+    s += [code('composer require vlucas/phpdotenv')]
+    s += [sp(6)]
+    s += [body('Dit installeert phpdotenv én voegt het toe aan `composer.json`. De `vendor/`-map wordt aangemaakt.')]
+    s += [sp(4)]
+
+    s += [h2('.gitignore aanmaken')]
+    s += [code("""vendor/
+.env""")]
+    s += [sp(6)]
+    s += [body('**Waarom `vendor/`?** Honderden bestanden die jij niet geschreven hebt. Iemand die jouw project wil draaien voert `composer install` uit en krijgt ze automatisch terug.')]
+    s += [sp(4)]
+    s += [body('**Waarom `.env`?** Hier komen je wachtwoorden in. Die horen nooit in git. Elke ontwikkelaar en elke server heeft zijn eigen `.env`.')]
+    s += [sp(4)]
+
+    s += [h2('.env aanmaken')]
+    s += [code("""DB_HOST=localhost
+DB_USER=root
+DB_PASS=
+DB_NAME=user_repo_opdracht""")]
+    s += [sp(4)]
+
+    s += [h2('index.php aanpassen')]
+    s += [code(r"""<?php
+
+require_once __DIR__ . '/vendor/autoload.php';
+
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+
+$pdo = new PDO(
+    'mysql:host=' . $_ENV['DB_HOST'] . ';dbname=' . $_ENV['DB_NAME'],
+    $_ENV['DB_USER'],
+    $_ENV['DB_PASS']
+);
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+$stmt = $pdo->prepare('SELECT * FROM users WHERE username = ?');
+$stmt->execute(['peter']);
+
+var_dump($stmt->fetch());""")]
+    s += [sp(6)]
+    s += [tip('`__DIR__` geeft altijd het absolute pad van de map waar dit bestand staat. Zonder `__DIR__` werkt het pad alleen als de browser het bestand precies vanuit die map aanroept — met `__DIR__` werkt het altijd.')]
+    s += [sp(4)]
+    s += [body('Ververs de browser. Het werkt nog steeds, maar je wachtwoord staat nu veilig buiten je code.')]
+    s += [sp(4)]
+
+    # ── Stap 3 ─────────────────────────────────────────────────────────────────
+    s += [h1('Stap 3: Alles op één plek')]
+    s += [body('**Probleem:** straks heb je meerdere PHP-pagina\'s. Al die pagina\'s hebben de autoloader en `.env` nodig. Nu moet je die twee regels op elke pagina herhalen.')]
+    s += [body('**Oplossing:** één `bootstrap.php` die je overal inlaadt. Alle initialisatie op één plek — als er iets verandert, pas je het op één plek aan.')]
+    s += [sp(4)]
+
+    s += [h2('bootstrap.php aanmaken')]
+    s += [code(r"""<?php
+
+require_once __DIR__ . '/vendor/autoload.php';
+
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();""")]
+    s += [sp(4)]
+
+    s += [h2('index.php vereenvoudigen')]
+    s += [code(r"""<?php
+
+require_once __DIR__ . '/bootstrap.php';
+
+$pdo = new PDO(
+    'mysql:host=' . $_ENV['DB_HOST'] . ';dbname=' . $_ENV['DB_NAME'],
+    $_ENV['DB_USER'],
+    $_ENV['DB_PASS']
+);
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+$stmt = $pdo->prepare('SELECT * FROM users WHERE username = ?');
+$stmt->execute(['peter']);
+
+var_dump($stmt->fetch());""")]
+    s += [sp(4)]
+    s += [body('Ververs de browser. Werkt nog steeds.')]
+    s += [sp(4)]
+
+    # ── Stap 4 ─────────────────────────────────────────────────────────────────
+    s += [h1('Stap 4: De Database-klasse')]
+    s += [body('**Probleem:** de PDO-initialisatie staat in `index.php`. Straks hebben meerdere pagina\'s een verbinding nodig — dan schrijf je dat blok code steeds opnieuw.')]
+    s += [body('**Oplossing:** een `Database`-klasse die de verbinding één keer aanmaakt en daarna hergebruikt.')]
+    s += [sp(4)]
+    s += [body('Maak de map `src/Config/` aan en daarin `Database.php`:')]
+    s += [code(r"""<?php
+
+namespace App\Config;
+
+use PDO;
+
+class Database
+{
+    public static PDO $pdo;
+
+    public static function getInstance(): PDO
+    {
+        if (!isset(self::$pdo)) {
+            self::$pdo = new PDO(
+                'mysql:host=' . $_ENV['DB_HOST'] . ';dbname=' . $_ENV['DB_NAME'],
+                $_ENV['DB_USER'],
+                $_ENV['DB_PASS']
+            );
+            self::$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        }
+
+        return self::$pdo;
+    }
+}""")]
+    s += [sp(6)]
+    s += [body('Er staan twee nieuwe dingen bovenaan: `namespace` en `use`. Die verdienen uitleg.')]
+    s += [sp(4)]
+
+    s += [h2('Namespaces')]
+    s += [body('`namespace App\\Config;` is het adres van deze klasse. Het voorkomt naambotsingen en vertelt de autoloader waar het bestand staat. De namespace volgt altijd de mappenstructuur binnen `src/`:')]
+    s += [two_col_table(
+        ['Namespace', 'Bestand'],
+        [
+            ('App\\\\Config\\\\Database',             'src/Config/Database.php'),
+            ('App\\\\Domain\\\\User',                 'src/Domain/User.php'),
+            ('App\\\\Repositories\\\\UserRepository', 'src/Repositories/UserRepository.php'),
+        ],
+        col_ratios=(0.48, 0.52),
+        hdr_bg=HDR_BG,
+    )]
+    s += [sp(6)]
+    s += [body('Dankzij de PSR-4 instelling in `composer.json` vindt PHP deze bestanden automatisch — geen `require_once` nodig voor je eigen klassen.')]
+    s += [sp(4)]
+
+    s += [h2('Waarom use PDO?')]
+    s += [body('Zodra je een `namespace` declareert, zoekt PHP alle klassenamen relatief aan die namespace. Schrijf je `new PDO(...)` in `namespace App\\Config`, dan zoekt PHP naar `App\\Config\\PDO`. Dat bestaat niet.')]
+    s += [sp(4)]
+    s += [body('`PDO` is een ingebouwde PHP-klasse in de *globale* namespace. Door `use PDO` bovenaan te zetten vertel je PHP: als ik `PDO` schrijf, bedoel ik de globale `PDO`.')]
+    s += [tip('Dit geldt voor alle ingebouwde PHP-klassen in een namespace: `PDO`, `PDOException`, `DateTime`, enzovoort.')]
+    s += [sp(4)]
+
+    s += [h2('static, self:: en $this')]
+    s += [body('Normaal maak je een object aan met `new`. Bij `Database` doe je dat nooit:')]
+    s += [code(r'$pdo = Database::getInstance();  // geen new, geen object')]
+    s += [sp(6)]
+    s += [body('**Waarom?** Je wil maar één databaseverbinding in je hele applicatie. Elke keer dat je `getInstance()` aanroept, krijg je dezelfde verbinding terug — het **singleton-patroon**. De check `!isset(self::$pdo)` zorgt dat de verbinding maar één keer wordt aangemaakt.')]
+    s += [sp(4)]
+    s += [body('Een statische property of methode hoort bij de **klasse zelf**, niet bij een specifiek object:')]
+    s += [two_col_table(
+        ['Schrijfwijze', 'Betekenis'],
+        [
+            ('$this->naam', 'dit specifieke object — alleen beschikbaar na new ...'),
+            ('self::$naam',  'de klasse zelf — altijd beschikbaar, ook zonder object'),
+        ],
+        col_ratios=(0.35, 0.65),
+        hdr_bg=HDR_BG,
+    )]
+    s += [sp(6)]
+    s += [tip('Je kunt `$this` niet gebruiken in een `static` methode — er is geen object aangemaakt met `new`.')]
+    s += [sp(4)]
+
+    s += [h2('Property vs lokale variabele')]
+    s += [code(r"""class Database
+{
+    public static PDO $pdo;       // PROPERTY: hoort bij de klasse, altijd beschikbaar
+
+    public static function getInstance(): PDO
+    {
+        $dsn = 'mysql:host=...';  // LOKALE VARIABELE: bestaat alleen in deze methode
+
+        if (!isset(self::$pdo)) {
+            self::$pdo = new PDO($dsn, ...);
+        }
+
+        return self::$pdo;
+    }
+}""")]
+    s += [sp(6)]
+    s += [body('`$dsn` verdwijnt zodra de methode klaar is. `self::$pdo` blijft bestaan zolang het script draait. Hetzelfde geldt met `$this` in gewone klassen:')]
+    s += [code(r"""class Voorbeeld
+{
+    private string $naam;         // PROPERTY: beschikbaar via $this->naam overal
+
+    public function __construct(string $naam)
+    {
+        $this->naam = $naam;      // $this->naam = property | $naam = lokale parameter
+    }
+
+    public function begroet(): string
+    {
+        $groet = 'Hallo, ';       // LOKALE VARIABELE: alleen hier
+        return $groet . $this->naam;
+    }
+}""")]
+    s += [sp(4)]
+
+    s += [h2('index.php aanpassen')]
+    s += [code(r"""<?php
+
+require_once __DIR__ . '/bootstrap.php';
+
+use App\Config\Database;
+
+$pdo = Database::getInstance();
+
+$stmt = $pdo->prepare('SELECT * FROM users WHERE username = ?');
+$stmt->execute(['peter']);
+
+var_dump($stmt->fetch());""")]
+    s += [sp(4)]
+    s += [body('Ververs de browser.')]
+    s += [sp(4)]
+
+    # ── Stap 5 ─────────────────────────────────────────────────────────────────
+    s += [h1('Stap 5: SQL uit index.php')]
+    s += [body('**Probleem:** de query staat nog in `index.php`. Straks heb je tien queries door elkaar staan.')]
+    s += [body('**Oplossing:** een `User`-klasse en een `UserRepository`.')]
+    s += [sp(4)]
+
+    s += [h2('User')]
+    s += [body('Maak de map `src/Domain/` aan en daarin `User.php`:')]
+    s += [code(r"""<?php
+
+namespace App\Domain;
+
+class User
+{
+    public function __construct(
+        public readonly int $id,
+        public readonly string $username,
+        public readonly string $email
+    ) {}
+}""")]
+    s += [sp(4)]
+
+    s += [h2('UserRepository')]
+    s += [body('Maak de map `src/Repositories/` aan en daarin `UserRepository.php`:')]
+    s += [code(r"""<?php
+
+namespace App\Repositories;
+
+use App\Domain\User;
+use PDO;
+
+class UserRepository
+{
+    public function __construct(private PDO $pdo) {}
+
+    public function findByUsername(string $username): ?User
+    {
+        $stmt = $this->pdo->prepare('SELECT * FROM users WHERE username = ?');
+        $stmt->execute([$username]);
+        $row = $stmt->fetch();
+
+        if ($row === false) {
+            return null;
+        }
+
+        return $this->hydrate($row);
+    }
+
+    private function hydrate(array $row): User
+    {
+        return new User(
+            id: (int) $row['id'],
+            username: $row['username'],
+            email: $row['email']
+        );
+    }
+}""")]
+    s += [sp(6)]
+    s += [tip('`use App\\Domain\\User` importeert je eigen klasse. `use PDO` importeert de ingebouwde PDO-klasse — hetzelfde principe als in de `Database`-klasse.')]
+    s += [sp(4)]
+
+    s += [h2('index.php — eindresultaat')]
+    s += [code(r"""<?php
+
+require_once __DIR__ . '/bootstrap.php';
+
+use App\Config\Database;
+use App\Repositories\UserRepository;
+
+$pdo        = Database::getInstance();
+$repository = new UserRepository($pdo);
+
+var_dump($repository->findByUsername('peter'));""")]
+    s += [sp(4)]
+
+    # ── Stap 6 ─────────────────────────────────────────────────────────────────
+    s += [h1('Stap 6: Terugkijken')]
+    s += [body('Zo begon je in stap 1:')]
+    s += [code(r"""$pdo = new PDO('mysql:host=localhost;dbname=user_repo_opdracht', 'root', '');
+$stmt = $pdo->prepare('SELECT * FROM users WHERE username = ?');
+$stmt->execute(['peter']);
+var_dump($stmt->fetch());""")]
+    s += [sp(6)]
+    s += [body('Zo ziet `index.php` er nu uit:')]
+    s += [code(r"""require_once __DIR__ . '/bootstrap.php';
+
+use App\Config\Database;
+use App\Repositories\UserRepository;
+
+$pdo        = Database::getInstance();
+$repository = new UserRepository($pdo);
+
+var_dump($repository->findByUsername('peter'));""")]
+    s += [sp(6)]
+    s += [body('`index.php` weet niets meer van SQL, wachtwoorden of hoe de verbinding werkt. Elke verantwoordelijkheid heeft een eigen plek:')]
+    s += [code("""Environment/
+├── src/
+│   ├── Config/
+│   │   └── Database.php       ← verbinding beheren
+│   ├── Domain/
+│   │   └── User.php           ← data representeren
+│   └── Repositories/
+│       └── UserRepository.php ← SQL schrijven
+├── vendor/
+├── .env                       ← geheime configuratie
+├── .gitignore
+├── bootstrap.php              ← initialisatie
+├── composer.json
+└── index.php                  ← entry point""")]
+    s += [sp(4)]
+
+    # ── Uitbreidingsopdrachten ─────────────────────────────────────────────────
+    s += [h1('Uitbreidingsopdrachten')]
+    s += [num(1, 'Voeg `findById(int $id): ?User` toe aan de repository.')]
+    s += [num(2, 'Voeg `findAll(): array` toe — geeft alle gebruikers terug als een array van `User`-objecten.')]
+    s += [num(3, 'Maak een tweede pagina `users.php` die alle gebruikers uitprint met ID en username. Het bestand mag alleen `require_once`, `use`-statements en aanroepen van de repository bevatten.')]
+
+    return s
+
 # ─── Render ────────────────────────────────────────────────────────────────────
 OUT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -671,3 +1074,4 @@ def render(story, filename):
 if __name__ == '__main__':
     render(opdracht_story(), 'Opdracht_UserRepository.pdf')
     render(cheatsheet_story(), 'Cheatsheet_CSR_Repository.pdf')
+    render(opdracht_environment_story(), 'Opdracht_Environment.pdf')

@@ -1,0 +1,13 @@
+# Front controller voor XAMPP/Apache.
+RewriteEngine On
+
+# Bescherm broncode en instellingen tegen rechtstreeks opvragen via de browser.
+# (Dit deed eerst de public/-map; nu we het project plat draaien doen we het hier.)
+RewriteRule ^(src|database|vendor)/ - [F,L]
+RewriteRule ^\.env - [F,L]
+
+# Elk verzoek dat niet naar een bestaand bestand/map wijst (dus geen css of
+# afbeelding) gaat naar de front controller.
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [QSA,L]
