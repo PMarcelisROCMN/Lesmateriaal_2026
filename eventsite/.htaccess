@@ -1,0 +1,10 @@
+RewriteEngine On
+RewriteBase /lesmateriaal/eventsite/
+
+# Bestaande bestanden en mappen in public/ gewoon serveren (css, js, afbeeldingen)
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^public/ - [L]
+
+# Al het andere (ook de root) naar public/index.php sturen
+RewriteRule ^ public/index.php [QSA,L]
