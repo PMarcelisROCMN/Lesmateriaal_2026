@@ -12,7 +12,10 @@ class EventController
 
     private function redirect(string $path): void
     {
-        header('Location: /lesmateriaal/eventsite' . $path);
+        // Onder de ingebouwde PHP-server draait de app op de root,
+        // onder Apache in de submap. Zet de juiste basis voor de redirect.
+        $base = php_sapi_name() === 'cli-server' ? '' : '/lesmateriaal/eventsite';
+        header('Location: ' . $base . $path);
         exit;
     }
 
@@ -27,7 +30,10 @@ class EventController
         } else {
             $events = $this->eventService->getAllEvents();
         }
-        
+
+        // wie is er ingelogd? (null als er niemand is ingelogd)
+        $currentUser = $this->authService->currentUser();
+
         require  __DIR__ . '/../Views/events_overview.php';
     }
 
@@ -43,12 +49,16 @@ class EventController
             return;
         }
 
+        // voor de nav bovenaan: wie is er ingelogd?
+        $currentUser = $this->authService->currentUser();
+
         require __DIR__ . '/../Views/event_details.php';
     }
 
-    public function showEventCreationForm()
+    public function showEventCreationForm(array $errors = [])
     {
-        $this->authService->requireAdmin();
+        // requireAdmin geeft de ingelogde beheerder terug, handig voor de nav.
+        $currentUser = $this->authService->requireAdmin();
         require __DIR__ . '/../Views/event_create.php';
     }
 
@@ -59,22 +69,20 @@ class EventController
         $title = $_POST['title'] ?? '';
         $description = $_POST['description'] ?? '';
 
-        // Validatie: zijn de velden gevuld?
-        if ($title === '' || $description === '') {
-            // Toon het overzicht opnieuw, mét een foutmelding.
-            $error = 'Vul zowel een titel als een beschrijving in.';
-            $this->showEventCreationForm();
+        // De service controleert titel en beschrijving en geeft eventuele fouten terug.
+        $errors = $this->eventService->addEvent($title, $description);
+
+        if (!empty($errors)) {
+            $this->showEventCreationForm($errors);
             return;
         }
-
-        $this->eventService->addEvent($title, $description);
 
         $this->redirect('/events');
     }
 
-    public function showEdit(int $eventId)
+    public function showEdit(int $eventId, array $errors = [])
     {
-        $this->authService->requireAdmin();
+        $currentUser = $this->authService->requireAdmin();
         $event = $this->eventService->getEvent($eventId);
         require __DIR__ . '/../Views/event_edit.php';
     }
@@ -82,7 +90,6 @@ class EventController
     public function edit(int $eventId)
     {
         $this->authService->requireAdmin();
-
 
         $event = $this->eventService->getEvent($eventId);
 
@@ -93,15 +100,15 @@ class EventController
         $title = $_POST['title'] ?? '';
         $description = $_POST['description'] ?? '';
 
-        if ($title === '' || $description === '') {
-            $error = 'Vul zowel een titel als een beschrijving in.';
-            $this->showEdit($eventId);
-            return;
-        }
-
         $changedEvent = new Event($eventId, $title, $description);
 
-        $this->eventService->editEvent($changedEvent);
+        // De service controleert en geeft eventuele fouten terug.
+        $errors = $this->eventService->editEvent($changedEvent);
+
+        if (!empty($errors)) {
+            $this->showEdit($eventId, $errors);
+            return;
+        }
 
         $this->redirect('/events');
     }
