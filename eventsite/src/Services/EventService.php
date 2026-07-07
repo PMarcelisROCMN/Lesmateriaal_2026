@@ -26,23 +26,23 @@ class EventService
     }
 
 
-    public function addEvent(string $title, string $description): array
+    public function addEvent(string $title, string $date, string $description, string $content): array
     {
-        $errors = $this->checkValidation($title, $description);
+        $errors = $this->checkValidation($title, $date, $description, $content);
 
         // Fouten? Dan slaan we niks op en geven we ze terug.
         if (!empty($errors)) {
             return $errors;
         }
 
-        $this->repository->create($title, $description);
+        $this->repository->create($title, $date, $description, $content);
 
         return $errors;
     }
 
     public function editEvent(Event $event): array
     {
-        $errors = $this->checkValidation($event->title, $event->description);
+        $errors = $this->checkValidation($event->title, $event->date, $event->description, $event->content);
 
         // Fouten? Dan slaan we niks op en geven we ze terug.
         if (!empty($errors)) {
@@ -65,7 +65,7 @@ class EventService
         return $this->repository->delete($id);
     }
 
-    private function checkValidation(string $title, string $description): array
+    private function checkValidation(string $title, string $date, string $description, string $content): array
     {
         $errors = [];
 
@@ -73,8 +73,16 @@ class EventService
             $errors[] = 'De titel moet tussen de 5 en 20 tekens zijn';
         }
 
+        if ($date === '') {
+            $errors[] = 'Kies een datum';
+        }
+
         if ($description === '') {
-            $errors[] = 'Vul een beschrijving in';
+            $errors[] = 'Vul een korte beschrijving in';
+        }
+
+        if ($content === '') {
+            $errors[] = 'Vul de volledige tekst in';
         }
 
         return $errors;

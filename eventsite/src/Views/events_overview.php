@@ -21,8 +21,13 @@ require __DIR__ . '/partials/header.php';
     <ul class="event-list">
         <?php foreach ($events as $event): ?>
             <li>
-                <span class="event-title"><?= htmlspecialchars($event->title) ?></span><br>
+                <span class="event-title"><?= htmlspecialchars($event->title) ?></span>
+                <span class="event-date"><?= htmlspecialchars(date('d-m-Y', strtotime($event->date))) ?></span>
+                <p class="muted"><?= htmlspecialchars($event->description) ?></p>
                 <a href="<?= BASE_URL ?>events/<?= $event->id ?>">Bekijk details</a>
+                <?php if($currentUser && $currentUser->isAdmin): ?>
+                    <a href="<?= BASE_URL ?>events/<?= $event->id ?>/edit">bewerk event</a>
+                <?php endif; ?>
             </li>
         <?php endforeach; ?>
     </ul>

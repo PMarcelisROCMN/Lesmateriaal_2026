@@ -11,7 +11,7 @@ class EventRepository
 
     public function getAll(): array
     {
-        $stmt = $this->pdo->query('SELECT id, title, description FROM events');
+        $stmt = $this->pdo->query('SELECT id, title, date, description, content FROM events');
 
         $events = [];
         foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
@@ -24,7 +24,7 @@ class EventRepository
 
     public function getById(int $id): ?Event
     {
-        $stmt = $this->pdo->prepare('SELECT id, title, description FROM events WHERE id = ?');
+        $stmt = $this->pdo->prepare('SELECT id, title, date, description, content FROM events WHERE id = ?');
         $stmt->execute([$id]);
 
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -35,18 +35,18 @@ class EventRepository
         return $this->hydrate($row);
     }
 
-    public function create(string $title, string $description): Event
+    public function create(string $title, string $date, string $description, string $content): Event
     {
-        $stmt = $this->pdo->prepare('INSERT INTO events (title, description) VALUES (?, ?)');
-        $stmt->execute([$title, $description]);
+        $stmt = $this->pdo->prepare('INSERT INTO events (title, date, description, content) VALUES (?, ?, ?, ?)');
+        $stmt->execute([$title, $date, $description, $content]);
 
-        return new Event((int) $this->pdo->lastInsertId(), $title, $description);
+        return new Event((int) $this->pdo->lastInsertId(), $title, $date, $description, $content);
     }
 
     public function edit(Event $event) : Event
     {
-        $stmt = $this->pdo->prepare('UPDATE events set title = ?, description = ? WHERE id = ?');
-        $stmt->execute([$event->title, $event->description, $event->id]);
+        $stmt = $this->pdo->prepare('UPDATE events set title = ?, date = ?, description = ?, content = ? WHERE id = ?');
+        $stmt->execute([$event->title, $event->date, $event->description, $event->content, $event->id]);
 
         return $event;
     }
@@ -71,7 +71,9 @@ class EventRepository
         return new Event(
             (int) $row['id'],
             $row['title'],
+            $row['date'],
             $row['description'],
+            $row['content'],
         );
     }
 }

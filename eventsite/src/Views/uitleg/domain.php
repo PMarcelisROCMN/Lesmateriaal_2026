@@ -9,7 +9,9 @@ class Event {
     public function __construct(
         public readonly int $id,
         public readonly string $title,
+        public readonly string $date,
         public readonly string $description,
+        public readonly string $content,
     ) {}
 }
 PHP;
@@ -25,7 +27,7 @@ PHP;
 
 $metDomain = <<<'PHP'
 // Met Domain: een net object met vaste eigenschappen
-$event = new Event(1, 'Concert', 'Een leuke avond');
+$event = $repository->getById(1);   // een Event-object
 
 echo $event->title;        // werkt, met autocomplete in de editor
 echo $event->titel;        // de editor onderstreept dit meteen: bestaat niet
@@ -40,7 +42,9 @@ private function hydrate(array $row): Event
     return new Event(
         (int) $row['id'],
         $row['title'],
+        $row['date'],
         $row['description'],
+        $row['content'],
     );
 }
 PHP;

@@ -67,10 +67,12 @@ class EventController
         $this->authService->requireAdmin();
 
         $title = $_POST['title'] ?? '';
+        $date = $_POST['date'] ?? '';
         $description = $_POST['description'] ?? '';
+        $content = $_POST['content'] ?? '';
 
-        // De service controleert titel en beschrijving en geeft eventuele fouten terug.
-        $errors = $this->eventService->addEvent($title, $description);
+        // De service controleert de invoer en geeft eventuele fouten terug.
+        $errors = $this->eventService->addEvent($title, $date, $description, $content);
 
         if (!empty($errors)) {
             $this->showEventCreationForm($errors);
@@ -98,9 +100,11 @@ class EventController
         }
 
         $title = $_POST['title'] ?? '';
+        $date = $_POST['date'] ?? '';
         $description = $_POST['description'] ?? '';
+        $content = $_POST['content'] ?? '';
 
-        $changedEvent = new Event($eventId, $title, $description);
+        $changedEvent = new Event($eventId, $title, $date, $description, $content);
 
         // De service controleert en geeft eventuele fouten terug.
         $errors = $this->eventService->editEvent($changedEvent);

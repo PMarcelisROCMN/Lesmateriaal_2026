@@ -7,7 +7,7 @@ $repoCode = <<<'PHP'
 // src/Repositories/EventRepository.php
 public function getById(int $id): ?Event
 {
-    $stmt = $this->pdo->prepare('SELECT id, title, description FROM events WHERE id = ?');
+    $stmt = $this->pdo->prepare('SELECT id, title, date, description, content FROM events WHERE id = ?');
     $stmt->execute([$id]);
 
     $row = $stmt->fetch(PDO::FETCH_ASSOC);

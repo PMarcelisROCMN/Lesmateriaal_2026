@@ -30,6 +30,9 @@ $currentUser = $currentUser ?? null;
             <span class="nav-left">
                 <a href="<?= BASE_URL ?>">Home</a>
                 <a href="<?= BASE_URL ?>events">Alle events</a>
+                <?php if ($currentUser && $currentUser->isAdmin): ?>
+                    <a href=<?= BASE_URL . "/events/create"?>>Create event</a>
+                <?php endif; ?>
             </span>
             <span>
                 <?php if ($currentUser): ?>
