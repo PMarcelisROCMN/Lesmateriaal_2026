@@ -57,12 +57,16 @@ $router->get('/events/(\d+)/edit', function ($eventId) use ($eventController) {
 
 // update specific event - in an API we would use put, but we can't
 $router->post('/events/(\d+)/edit', function ($eventId) use ($eventController) {
-    $eventController->edit($eventId);
+    if($_POST['action'] == "Opslaan"){
+        $eventController->edit($eventId);
+        } else if ($_POST['action'] == "Verwijderen"){
+            $eventController->delete($eventId);
+        }
 });
 
 // delete a specific event
 $router->post('/events/(\d+)/delete', function ($eventId) use ($eventController) {
-    $eventController->deleteEvent($eventId);
+    $eventController->delete($eventId);
 });
 
 // toont het inlogscherm

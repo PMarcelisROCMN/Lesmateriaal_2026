@@ -82,6 +82,14 @@ class EventController
         $this->redirect('/events');
     }
 
+    public function delete(int $eventId){
+        $this->authService->requireAdmin();
+
+        $this->eventService->deleteEvent($eventId);
+
+        $this->redirect('/events');
+    }
+
     public function showEdit(int $eventId, array $errors = [])
     {
         $currentUser = $this->authService->requireAdmin();
@@ -115,11 +123,5 @@ class EventController
         }
 
         $this->redirect('/events');
-    }
-
-    public function deleteEvent(int $eventId)
-    {
-        $this->authService->requireAdmin();
-        $this->eventService->deleteEvent($eventId);
     }
 }

@@ -27,7 +27,8 @@ require __DIR__ . '/partials/header.php';
     <label for="content">Volledige tekst</label>
     <textarea name="content" id="content" rows="8"><?= htmlspecialchars($event->content) ?></textarea>
 
-    <input type="submit" value="Opslaan">
+    <input type="submit" value="Opslaan" name="action">
+    <input type="submit" value="Verwijderen" name="action">
 </form>
 
 <?php require __DIR__ . '/partials/footer.php'; ?>
