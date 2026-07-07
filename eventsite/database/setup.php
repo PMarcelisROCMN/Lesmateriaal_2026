@@ -16,4 +16,18 @@ $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 $sql = file_get_contents($schemaFile);
 $pdo->exec($sql);
 
+// Voorbeeld-gebruikers aanmaken. We hashen de wachtwoorden hier in PHP,
+// zodat er nooit een leesbaar wachtwoord in de database komt te staan.
+$users = [
+    // username, wachtwoord, isAdmin
+    ['admin', 'admin123', 1],
+    ['piet',  'piet123',  0],
+];
+
+$stmt = $pdo->prepare('INSERT INTO users (username, password, isAdmin) VALUES (?, ?, ?)');
+foreach ($users as [$username, $password, $isAdmin]) {
+    $stmt->execute([$username, password_hash($password, PASSWORD_DEFAULT), $isAdmin]);
+}
+
 echo "Database klaar: $databaseFile\n";
+echo "Inloggen kan met: admin / admin123 (beheerder) of piet / piet123\n";

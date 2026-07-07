@@ -1,24 +1,26 @@
 <?php
- if (isset($error)){
-    echo $error;
- }
+
+/** @var \App\Domain\User|null $currentUser */
+
+$title = 'Nieuw event';
+
+require __DIR__ . '/partials/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create a new event</title>
-</head>
-<body>
-    <form action="" method="post">
-        <label for="event_title">Event title:</label>
-        <input type="text" name="title" placeholder="Fill in a title..">
-        <br>
-        <label for="event_description">Event description:</label>
-        <input type="text" name="description" placeholder="Fill in a description">
-        <br>
-        <input type="submit">
-    </form>
-</body>
-</html>
+
+<h1>Nieuw event aanmaken</h1>
+
+<?php foreach ($errors ?? [] as $error): ?>
+    <p class="error"><?= htmlspecialchars($error) ?></p>
+<?php endforeach; ?>
+
+<form action="" method="post">
+    <label for="title">Titel</label>
+    <input type="text" name="title" id="title" placeholder="Vul een titel in...">
+
+    <label for="description">Beschrijving</label>
+    <input type="text" name="description" id="description" placeholder="Vul een beschrijving in...">
+
+    <input type="submit" value="Aanmaken">
+</form>
+
+<?php require __DIR__ . '/partials/footer.php'; ?>
